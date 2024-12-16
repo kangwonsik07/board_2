@@ -8,6 +8,11 @@ module.exports = class Board extends Sequelize.Model {
                type: Sequelize.TEXT,
                allowNull: false,
             },
+            img: {
+               //이미지 경로 및 파일명
+               type: Sequelize.STRING(200),
+               allowNull: true,
+            },
          },
          {
             sequelize,
@@ -24,5 +29,6 @@ module.exports = class Board extends Sequelize.Model {
 
    static associate(db) {
       db.Board.belongsTo(db.User)
+      db.Board.belongsToMany(db.Hashtag, { through: 'BoardHashtag' })
    }
 }

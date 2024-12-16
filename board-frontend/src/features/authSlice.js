@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
-import { registerUser, loginUser, logoutUser } from '../api/boardApi'
+import { registerUser, loginUser, logoutUser, checkAuthStatus } from '../api/boardApi'
 
 export const registerUserThunk = createAsyncThunk('/registerUser', async (userData, { rejectWithValue }) => {
    try {
@@ -19,12 +19,21 @@ export const loginUserThunk = createAsyncThunk('/loginUser', async (credentials,
    }
 })
 
-export const logoutUserThunk = createAsyncThunk('/logoutUser', async (_, { rejectWithValue }) => {
+export const logoutUserThunk = createAsyncThunk('/logoutUser', async (_, rejectWithValue) => {
    try {
       const response = await logoutUser()
       return response.data
    } catch (error) {
       return rejectWithValue(error.response?.data?.message || '로그아웃 실패')
+   }
+})
+
+export const checkAuthStatusThunk = createAsyncThunk('/checkAuthStatus', async (_, { rejectWithValue }) => {
+   try {
+      const response = await checkAuthStatus()
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message || '상태 확인 실패')
    }
 })
 
@@ -83,6 +92,23 @@ const authSlice = createSlice({
          .addCase(logoutUserThunk.rejected, (state, action) => {
             state.loading = true
             state.error = action.payload
+         })
+      // 로그인 상태 확인
+      builder
+         .addCase(checkAuthStatusThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(checkAuthStatusThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.isAuthenticated = action.payload.isAuthenticated
+            state.user = action.payload.user || null
+         })
+         .addCase(checkAuthStatusThunk.rejected, (state, action) => {
+            state.loading = true
+            state.isAuthenticated = false
+            state.error = action.payload
+            state.user = null
          })
    },
 })
