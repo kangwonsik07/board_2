@@ -98,5 +98,56 @@ router.put('/:id', isLoggedIn, upload.single('img'), async (req, res) => {
 })
 
 //게시물 삭제
+router.delete('/:id', isLoggedIn, async (req, res) => {
+   try {
+      //삭제할 게시물 존재여부 확인
+      const board = await Board.findOne({ where: { id: req.params.id, UserId: req.user.id } })
+      if (!Board) {
+         return res.status(404).json({ success: false, message: '게시물을 찾을 수 없음' })
+      }
+
+      await board.destroy()
+
+      res.json({
+         success: true,
+         message: '게시물 삭제 완료',
+      })
+   } catch (error) {
+      console.error(error)
+      res.status(500).json({ success: false, message: '게시물 삭제 중 오류가 발생했습니다.', error })
+   }
+})
 
 // 특정 게시물 불러오기
+router.get('/:id', async (req, res) => {
+   try {
+      const board = await Board.findOne({
+         where: { id: req.params.id },
+         include: [
+            {
+               model: User,
+               attributes: ['id', 'nick'],
+            },
+            {
+               model: Hashtag,
+               attributes: ['tatle'],
+            },
+         ],
+      })
+
+      if (!board) {
+         return res.status(404).json({ success: false, message: '게시물을 찾을 수 없음' })
+      }
+
+      res.json({
+         success: true,
+         board,
+         message: '게시물 불러오기 완료',
+      })
+   } catch (error) {
+      console.error(error)
+      res.status(500).json({ success: false, message: '게시물 불러오는 중 오류가 발생했습니다.', error })
+   }
+})
+
+module.exports = router

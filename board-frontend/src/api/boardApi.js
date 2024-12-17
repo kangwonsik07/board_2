@@ -52,3 +52,71 @@ export const checkAuthStatus = async () => {
       throw error
    }
 }
+
+// 보드 등록
+export const createBoard = async (boardData) => {
+   try {
+      const config = {
+         headers: {
+            'Content-Type': 'multipart/form-data', // 데이터 형식 지정 , 파일 정송시 반드시 지정
+         },
+      }
+
+      const response = await boardApi.post('/board', boardData, config)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error.message}`)
+      throw error
+   }
+}
+
+// 보드 수정
+
+export const updateBoard = async (id, boardData) => {
+   try {
+      const config = {
+         headers: {
+            'Content-Type': 'multipart/form-data', // 데이터 형식 지정 , 파일 정송시 반드시 지정
+         },
+      }
+
+      const response = await boardApi.post(`/board/${id}`, boardData, config)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error.message}`)
+      throw error
+   }
+}
+
+// 보드 삭제
+export const deleteBoard = async (id) => {
+   try {
+      const response = await boardApi.delete(`/board/${id}`)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error.message}`)
+      throw error
+   }
+}
+
+// 특정 보드 가져오기
+export const getBoardById = async (id) => {
+   try {
+      const response = await boardApi.get(`/board/${id}`)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error.message}`)
+      throw error
+   }
+}
+
+// 전체 보드 가져오기(페이징)
+export const getBoards = async (page) => {
+   try {
+      const response = await boardApi.get(`/board?page=${page}`)
+      return response
+   } catch (error) {
+      console.error(`API Request 오류: ${error.message}`)
+      throw error
+   }
+}
