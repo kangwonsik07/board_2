@@ -10,6 +10,7 @@ const passport = require('passport')
 const authRouter = require('./routes/auth')
 const { sequelize } = require('./models')
 const passportConfig = require('./passport')
+const boardRotuer = require('./routes/board')
 
 const app = express()
 app.set('port', process.env.PORT || 8002)
@@ -51,6 +52,7 @@ app.use(passport.initialize())
 app.use(passport.session())
 
 app.use('/', authRouter)
+app.use('/board', boardRotuer)
 
 app.use((req, res, next) => {
    const error = new Error(`${req.method} ${req.url} 라우터가 없습니다.`)

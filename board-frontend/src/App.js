@@ -4,6 +4,8 @@ import Login from './pages/login'
 import { Routes, Route } from 'react-router-dom'
 import { useEffect } from 'react'
 import { checkAuthStatusThunk } from './features/authSlice'
+import Board from './pages/board'
+import BoardCreatePage from './pages/BoardCreatePage'
 
 function App() {
    const dispatch = useDispatch()
@@ -18,6 +20,8 @@ function App() {
       <Routes>
          <Route path="/" element={<Home isAuthenticated={isAuthenticated} user={user} />} />
          <Route path="/Login" element={<Login />} />
+         <Route path="/board" element={<Board />} />
+         <Route path="board/create" element={<BoardCreatePage />} />
       </Routes>
    )
 }

@@ -96,6 +96,7 @@ const Home = ({ isAuthenticated, user }) => {
          ) : (
             <Link to="/Login">로그인</Link>
          )}
+         <Link to="/board">게시판</Link>
       </Container>
    )
 }

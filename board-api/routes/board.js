@@ -61,7 +61,7 @@ router.post('/', isLoggedIn, upload.single('img'), async (req, res) => {
 // 게시물 수정
 router.put('/:id', isLoggedIn, upload.single('img'), async (req, res) => {
    try {
-      const board = await Board.findOne({ where: { id: req.params.id, UserId: req.params.id } })
+      const board = await Board.findOne({ where: { id: req.params.id, UserId: req.user.id } })
       if (!board) {
          return res.status(404).json({ success: false, message: '게시물을 찾을 수 없습니다.' })
       }
@@ -147,6 +147,64 @@ router.get('/:id', async (req, res) => {
    } catch (error) {
       console.error(error)
       res.status(500).json({ success: false, message: '게시물 불러오는 중 오류가 발생했습니다.', error })
+   }
+})
+
+// 전체 게시물 불러오기(페이징 가능) localhost:8000/post/
+router.get('/', async (req, res) => {
+   try {
+      // parseInt('08') -> 일부 브라우저에서 NaN 반환
+      // parseInt('08', 10) -> 10진수 8을 반환
+      const page = parseInt(req.query.page, 10) || 1 // page번호(기본값: 1)
+      const limit = parseInt(req.query.limit, 10) || 3 // 한페이지당 나타낼 게시물(레코드) 갯수(기본값: 3)
+      const offset = (page - 1) * limit // 오프셋 계산
+
+      // 게시물 레코드의 전체 갯수 가져오기
+      // select count(*) from posts
+      const count = await Board.count()
+
+      // 게시물 레코드를 가져오기
+      /*
+         page:1, limit:3, offset: 0 -> 0개의 레코드를 건너띄고 3개의 최신 레코드를 가져온다
+         select * from posts order by createdAt desc limit 3 offset 0
+
+         page:2, limit:3, offset: 3 -> 3개의 레코드를 건너띄고 4번째 부터 3개의 최신 레코드를 가져온다
+         select * from posts order by createdAt desc limit 3 offset 3
+
+         page:3, limit:3, offset: 6 -> 6개의 레코드를 건너띄고 7번째 부터 3개의 최신 레코드를 가져온다
+         select * from posts order by createdAt desc limit 3 offset 6
+         */
+      const boards = await Board.findAll({
+         limit,
+         offset,
+         order: [['createdAt', 'DESC']], // 최신날짜 순으로 가져온다
+         // 게시글을 작성한 사람과 게시글에 작성된 해시태그를 같이 가져온다
+         include: [
+            {
+               model: User,
+               attributes: ['id', 'nick', 'email'],
+            },
+            {
+               model: Hashtag,
+               attributes: ['title'],
+            },
+         ],
+      })
+
+      res.json({
+         success: true,
+         boards,
+         pagination: {
+            totalPosts: count, // 전체 게시물 수
+            currentPage: page, // 현재 페이지
+            totalPages: Math.ceil(count / limit), // 총 페이지 수
+            limit, // 페이지당 게시물 수
+         },
+         message: '전체 게시물 리스트를 성공적으로 불러왔습니다.',
+      })
+   } catch (error) {
+      console.error(error)
+      res.status(500).json({ success: false, message: '게시물 리스트를 불러오는 중 오류가 발생했습니다.', error })
    }
 })
 
