@@ -14,7 +14,7 @@ const BoardCreatePage = () => {
          dispatch(createBoardThunk(boardData))
             .unwrap()
             .then(() => {
-               navigate('/board')
+               navigate('/boards')
             })
             .catch((error) => {
                console.error('게시물 등록 에러', error)

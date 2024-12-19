@@ -128,10 +128,6 @@ router.get('/:id', async (req, res) => {
                model: User,
                attributes: ['id', 'nick'],
             },
-            {
-               model: Hashtag,
-               attributes: ['tatle'],
-            },
          ],
       })
 

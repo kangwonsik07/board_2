@@ -14,7 +14,6 @@ const Home = ({ isAuthenticated, user }) => {
    const dispatch = useDispatch()
    const navigate = useNavigate()
    const { loading, error } = useSelector((state) => state.auth)
-   console.log(isAuthenticated)
 
    const handleLogout = useCallback(() => {
       dispatch(logoutUserThunk())
@@ -96,7 +95,7 @@ const Home = ({ isAuthenticated, user }) => {
          ) : (
             <Link to="/Login">로그인</Link>
          )}
-         <Link to="/board">게시판</Link>
+         <Link to="/boards">게시판</Link>
       </Container>
    )
 }

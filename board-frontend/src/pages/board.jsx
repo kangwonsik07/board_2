@@ -9,7 +9,8 @@ const Board = ({ isAuthenticated, user }) => {
    const [page, setPage] = useState(1) // 현재 페이지
    const dispatch = useDispatch()
    const { boards, pagination, loading, error } = useSelector((state) => state.boards)
-
+   console.log('isAuthenticatedboard:', isAuthenticated)
+   console.log('user:', user)
    useEffect(() => {
       dispatch(fetchBoardsThunk(page))
    }, [dispatch, page])
@@ -20,7 +21,7 @@ const Board = ({ isAuthenticated, user }) => {
 
    return (
       <Container maxWidth="xs">
-         <Link to="/board/create">게시판 등록</Link>
+         <Link to="/boards/create">게시판 등록</Link>
          <Typography variant="h4" align="center" gutterBottom>
             Home Feed
          </Typography>

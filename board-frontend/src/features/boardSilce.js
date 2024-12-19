@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 import { createBoard, updateBoard, deleteBoard, getBoardById, getBoards } from '../api/boardApi'
 
 //게시물 등록 thunk
-export const createBoardThunk = createAsyncThunk('board/createBoard', async (boardData, { rejectWithValue }) => {
+export const createBoardThunk = createAsyncThunk('boards/createBoard', async (boardData, { rejectWithValue }) => {
    try {
       const response = await createBoard(boardData)
       return response.data.board
@@ -11,9 +11,41 @@ export const createBoardThunk = createAsyncThunk('board/createBoard', async (boa
    }
 })
 
+//게시물 수정
+export const updateBoardThunk = createAsyncThunk('/boards/updateBoard', async (data, { rejectWithValue }) => {
+   try {
+      const { id, boardData } = data
+      const response = await updateBoard(id, boardData)
+      return response.data.board
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message || '게시물 수정 실패')
+   }
+})
+
+// 게시물 삭제
+export const deleteBoardThunk = createAsyncThunk('boards/deleteBoard', async (id, { rejectWithValue }) => {
+   try {
+      // eslint-disable-next-line
+      const response = await deleteBoard(id)
+      return id // 삭제성공 후 삭제된 게시물의 id만 반환
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message || '게시물 삭제 실패')
+   }
+})
+
+// 특정 게시물 가져오기
+export const fetchBoardByIdThunk = createAsyncThunk('boards/fetchBoardById', async (id, { rejectWithValue }) => {
+   try {
+      const response = await getBoardById(id)
+      return response.data
+   } catch (error) {
+      return rejectWithValue(error.response?.data?.message || '게시물 리스트 불러오기 실패')
+   }
+})
+
 //전체 게시물 가져오기
 
-export const fetchBoardsThunk = createAsyncThunk('boards/fetchBoards', async (page, { rejectWithValue }) => {
+export const fetchBoardsThunk = createAsyncThunk('boards/fetchBoard', async (page, { rejectWithValue }) => {
    try {
       const response = await getBoards(page)
       return response.data
@@ -46,6 +78,7 @@ const boardSlice = createSlice({
             state.loading = false
             state.error = action.payload
          })
+      // 전제 게시물 가져오기
       builder
          .addCase(fetchBoardsThunk.pending, (state) => {
             state.loading = true
@@ -57,6 +90,46 @@ const boardSlice = createSlice({
             state.pagination = action.payload.pagination
          })
          .addCase(fetchBoardsThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+         })
+      // 게시물 수정
+      builder
+         .addCase(updateBoardThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(updateBoardThunk.fulfilled, (state, action) => {
+            state.loading = false
+         })
+         .addCase(updateBoardThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+         })
+      // 게시물 삭제
+      builder
+         .addCase(deleteBoardThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(deleteBoardThunk.fulfilled, (state, action) => {
+            state.loading = false
+         })
+         .addCase(deleteBoardThunk.rejected, (state, action) => {
+            state.loading = false
+            state.error = action.payload
+         })
+      // 특정 게시물 불러오기
+      builder
+         .addCase(fetchBoardByIdThunk.pending, (state) => {
+            state.loading = true
+            state.error = null
+         })
+         .addCase(fetchBoardByIdThunk.fulfilled, (state, action) => {
+            state.loading = false
+            state.board = action.payload.board
+         })
+         .addCase(fetchBoardByIdThunk.rejected, (state, action) => {
             state.loading = false
             state.error = action.payload
          })

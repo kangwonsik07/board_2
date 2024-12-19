@@ -80,7 +80,7 @@ export const updateBoard = async (id, boardData) => {
          },
       }
 
-      const response = await boardApi.post(`/board/${id}`, boardData, config)
+      const response = await boardApi.put(`/board/${id}`, boardData, config)
       return response
    } catch (error) {
       console.error(`API Request 오류: ${error.message}`)
